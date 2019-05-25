@@ -42,6 +42,7 @@ public class Ppoint {
 		}
 
 		k = (y2 - y1) / (x2 - x1);
+		System.out.println(k);
 		return k;
 
 	}
@@ -68,11 +69,11 @@ public class Ppoint {
 		//		new Node(-122.1067333,47.66751667),
 		//		node));
 
-		//Node a = new Node(-122.105779051781,47.6666790246964);
-		Node a = new Node(205.395583333332,57.9323888888888);
+		Node a = new Node(-122.105779051781,47.6666790246964);
+		//Node a = new Node(205.395583333332,57.9323888888888);
 		Node b = new Node(-122.105398178101,47.6675292849541);
 		Node c = new Node(-122.1067333,47.66751667);
-		a = Transform.to2D(a.getLon(),a.getLat());
+		//a = Transform.to2D(a.getLon(),a.getLat());
 		//b = Transform.to2D(b.getLon(),b.getLat());
 		//c = Transform.to2D(c.getLon(),c.getLat());
 		System.out.println(a);
@@ -90,6 +91,10 @@ public class Ppoint {
 				new TestData(c.getLat(),c.getLon())));
 		System.out.println(ObtainedData2.isInTriangle(a,b,c,
 				node));
+		System.out.println(Gdistance.getDistance(node.getLat(),node.getLon(),a.getLat(),a.getLon()));
+		System.out.println(Gdistance.getDistance(node.getLat(),node.getLon(),b.getLat(),b.getLon()));
+		System.out.println(Gdistance.getDistance(a.getLat(),a.getLon(),b.getLat(),b.getLon()));
+		System.out.println(Gdistance.getDistance(node.getLat(),node.getLon(),a.getLat(),a.getLon())+Gdistance.getDistance(node.getLat(),node.getLon(),b.getLat(),b.getLon()));
 
 	}
 }

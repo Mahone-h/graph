@@ -748,21 +748,30 @@ public class ObtainedData2 {
 	}
 
 	public static boolean isInTriangle(Node A,Node B,Node C,Node P){
-		double a = 0, b = 0, c = 0;
-
-		Node MA = new Node(P.getLat() - A.getLat(),P.getLon() - A.getLon());
-		Node MB = new Node(P.getLat() - B.getLat(),P.getLon() - B.getLon());
-		Node MC = new Node(P.getLat() - C.getLat(),P.getLon() - C.getLon());
-
-		/*向量叉乘*/
-		a = MA.getLat() * MB.getLon() - MA.getLon() * MB.getLat();
-		b = MB.getLat() * MC.getLon() - MB.getLon() * MC.getLat();
-		c = MC.getLat() * MA.getLon() - MC.getLon() * MA.getLat();
-
-		if((a <= 0 && b <= 0 && c <= 0)||
-				(a > 0 && b > 0 && c > 0))
+		//double a = 0, b = 0, c = 0;
+		//
+		//Node MA = new Node(P.getLat() - A.getLat(),P.getLon() - A.getLon());
+		//Node MB = new Node(P.getLat() - B.getLat(),P.getLon() - B.getLon());
+		//Node MC = new Node(P.getLat() - C.getLat(),P.getLon() - C.getLon());
+		//
+		///*向量叉乘*/
+		//a = MA.getLat() * MB.getLon() - MA.getLon() * MB.getLat();
+		//b = MB.getLat() * MC.getLon() - MB.getLon() * MC.getLat();
+		//c = MC.getLat() * MA.getLon() - MC.getLon() * MA.getLat();
+		//
+		//if((a <= 0 && b <= 0 && c <= 0)||
+		//		(a > 0 && b > 0 && c > 0))
+		//	return true;
+		//return false;
+		double a = Gdistance.getDistance(A.getLat(), A.getLon(), P.getLat(), P.getLon());
+		double b = Gdistance.getDistance(B.getLat(), B.getLon(), P.getLat(), P.getLon());
+		double c =Gdistance.getDistance(B.getLat(), B.getLon(), A.getLat(), A.getLon());
+		if (a<c&&b<c){
 			return true;
-		return false;
-		
+		}
+		else {
+			return false;
+		}
+
 	}
 }
