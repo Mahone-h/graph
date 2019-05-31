@@ -10,7 +10,28 @@ public class RoadsData implements Comparator<FixData>{
 	private long from_Node_ID;
 	private long to_Node_ID;
 	private int two_Way;
-	List<Node> nodes=new ArrayList<>();
+	List<Node> nodes;
+	List<Node> nodes2D;
+
+	public List<Node> getNodes2D() {
+		return nodes2D;
+	}
+
+	public void setNodes2D(List<Node> nodes2D) {
+		this.nodes2D = nodes2D;
+	}
+
+	public RoadsData(long edge_ID, long from_Node_ID, long to_Node_ID,
+					 int two_Way, List<Node> nodes, List<Node> nodes2D) {
+		super();
+		this.edge_ID = edge_ID;
+		this.from_Node_ID = from_Node_ID;
+		this.to_Node_ID = to_Node_ID;
+		this.two_Way = two_Way;
+		this.nodes = nodes;
+		this.nodes2D = nodes2D;
+	}
+
 	public long getEdge_ID() {
 		return edge_ID;
 	}

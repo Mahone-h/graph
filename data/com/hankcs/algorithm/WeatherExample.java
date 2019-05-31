@@ -1,5 +1,7 @@
 package com.hankcs.algorithm;
 
+import DATA.Viterbi;
+
 import static com.hankcs.algorithm.WeatherExample.Weather.*;
 import static com.hankcs.algorithm.WeatherExample.Activity.*;
 

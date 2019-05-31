@@ -2,17 +2,17 @@ package com.cn.dataprocess;
 
 import DATA.Gdistance;
 import DATA.Ppoint;
+import DATA.Viterbi;
 import DATA.pointToLine;
 import com.cn.beans.*;
 import com.hankcs.algorithm.HMM;
-import com.hankcs.algorithm.Viterbi;
-import com.sun.javafx.collections.MappingChange;
+
 import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.rmi.RemoteException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**ObtainedData类
@@ -23,7 +23,7 @@ import java.util.*;
  */
 public class ObtainedData2 {
 	/**声名静态类成员measureRate ，表示一个二维数组*/
-	public static double[][] measureRate = null;
+
 
 	public static List<TestData> getTestDatas() throws Exception {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -34,7 +34,8 @@ public class ObtainedData2 {
 		while ((line = reader.readLine()) != null) {
 			String[] strs = line.split(";");
 			testDatas.add(new TestData(Double.parseDouble(strs[1]), Double
-					.parseDouble(strs[0])));
+					.parseDouble(strs[0]),Transform.lonto2D(Double.parseDouble(strs[1])),
+					Transform.latto2D(Double.parseDouble(strs[0]))));
 		}
 		reader.close();
 		//System.out.println(testDatas.size());
@@ -52,6 +53,7 @@ public class ObtainedData2 {
 		List<RoadsData> roadsDatas = new ArrayList<>();
 		Node node = null;
 		List<Node> nodes = null;
+		List<Node> nodes2D = null;
 		int count = 0;
 
 		try {
@@ -61,17 +63,19 @@ public class ObtainedData2 {
 				String[] n = strs[6].replaceAll("LINESTRING", "")
 						.replaceAll("\\(", "").replaceAll("\\)", "").split(",");
 				nodes = new ArrayList<>();
+				nodes2D = new ArrayList<>();
 				count++;
 				for (String s : n) {
 					String[] tmps = s.trim().split(" ");
 					node = new Node(Double.parseDouble(tmps[0]),
 							Double.parseDouble(tmps[1]));
 					nodes.add(node);
+					nodes2D.add(new Node(Transform.lonto2D(node.getLon()), Transform.latto2D(node.getLat())));
 				}
 
 				RoadsData roadsData = new RoadsData(Long.parseLong(strs[0]),
 						Long.parseLong(strs[1]), Long.parseLong(strs[2]),
-						Integer.parseInt(strs[3]), nodes);
+						Integer.parseInt(strs[3]), nodes,nodes2D);
 				roadsDatas.add(roadsData);
 			}
 		} catch (Exception e) {
@@ -129,7 +133,7 @@ public class ObtainedData2 {
 //			在fix对象中添加FixData类里存的道路信息属性
 			fix.add(new FixData(data.get(i).getEdge_ID(), data.get(i)
 					.getFrom_Node_ID(), data.get(i).getTo_Node_ID(), data
-					.get(i).getTwo_Way(), nodes, data.get(i).getNodes()));
+					.get(i).getTwo_Way(), nodes, data.get(i).getNodes(),data.get(i).getNodes2D()));
 			/*
 			 * 实现类的clear 方式将里面的所有元素都释放了并且清空里面的属性 
 			 */
@@ -230,14 +234,17 @@ public class ObtainedData2 {
 				start = i;
 				tag = 1;
 			}
-			if ((double) fixDatas.get(i).getNodes().get(1) >= a && start != 0
+			if ((double) fixDatas.get(i).getNodes().get(1) > a && start != 0
 					&& end == 0) {
 				end = i;
-				tag = 0;
+				tag = 2;
 			}
 			if (tag == 1) {
 				lonResult.add(fixDatas.get(i));
 				// System.out.println(fixDatas.get(i).getNodes().get(3));
+			}
+			if(tag==2){
+				break;
 			}
 		}
 		// System.out.println(start+"----------------------"+end);
@@ -282,15 +289,18 @@ public class ObtainedData2 {
 				start = i;
 				tag = 1;
 			}
-			if ((double) fixDatas.get(i).getNodes().get(3) >= a && start != 0
+			if ((double) fixDatas.get(i).getNodes().get(3) > a && start != 0
 					&& end == 0) {
 				end = i;
-				tag = 0;
+				tag = 2;
 			}
 			if (tag == 1) {
 				latResult.add(fixDatas.get(i));
 				// System.out.println(fixDatas.get(i).getNodes().get(0)
 				// + "~~~~~~~~~~" + fixDatas.get(i).getNodes().get(3));
+			}
+			if(tag==2){
+				break;
 			}
 
 		}
@@ -310,31 +320,23 @@ public class ObtainedData2 {
 	 * @throws
 	 */
 	public void test() throws Exception {
-		//List<FixData> list = getFixdata();
-		//List<FixData> list = getFixdata();
-		//getLatRange(-122.1070833, 47.66748333,0.001798,0.00263732, list);
+		double lon = -122.1070833;
+		double dis=0.2;
+		double r = 6371;//地球半径千米
+		double lat=47.66748333;
 
-		//List<TestData> testDatas = ObtainedData.getTestDatas();
-		//System.out.println(testDatas.size());
-		//List<TestData> tmpTestDatas = new ArrayList<>();
-		//int i = 0;
-		//while (i+1 < testDatas.size()) {
-		//	tmpTestDatas.add(testDatas.get(i));
-		//	i = getI(testDatas, i);
-		//	//double distance = Gdistance.getDistance(testDatas.get(i).getLon(),
-		//	//		testDatas.get(i).getLat(), testDatas.get(i + 1).getLon(),
-		//	//		testDatas.get(i + 1).getLat());
-		//	//System.out.println("相邻点---"+distance);
-		//	//if(distance==0.0){
-		//	//	count++;
-		//	//}
-		//	//System.out.println("相邻两点---"+Gdistance.getDistance(testDatas.get(i-1).getLon(),
-		//	//		testDatas.get(i-1).getLat(), testDatas.get(i+2).getLon(),
-		//	//		testDatas.get(i+2).getLat())+"======");
-		//
-		//
-		//}
-		//System.out.println(tmpTestDatas.size());
+		double dlat = dis/r;
+		dlat = dlat*180/Math.PI;
+		double a = lat + dlat;
+		double b = lat - dlat;
+
+		double dlng =  2*Math.asin(Math.sin(dis/(2*r))/Math.cos(lat*Math.PI/180));
+		dlng = dlng*180/Math.PI;//角度转为弧度
+		double c = lon + dlng;
+		double d = lon - dlng;
+		System.out.println(lon+"--"+lat);
+		System.out.println(c+","+a+"--"+d+","+b);
+
 	}
 
 
@@ -382,7 +384,7 @@ public class ObtainedData2 {
 		/**
 		 * Fixdata(获取路网数据 添加最大最小)
 		 */
-		List<FixData> list = getFixdata();
+		List<FixData> roadlist = getFixdata();
 		//List<FixData> meaList = new ArrayList<>();
 		/*
 		 * 将list（道路数据）中所有的元素都放在meaList中
@@ -407,7 +409,7 @@ public class ObtainedData2 {
 		for (TestData testData : tmpTestDatas) {
 			// System.out.println(testData.getLat()+"----------------"+testData.getLon());
 			fixdatas.add(getLatRange(testData.getLon(), testData.getLat(),
-					0.2, list));
+					0.2, roadlist));
 		}
 
 		List<RoadPoint> d = null;
@@ -428,7 +430,8 @@ public class ObtainedData2 {
 			Map<Long, FixData> idMap = new HashMap<>();
 			//
 			for (FixData f : fs) {
-				RoadPoint roadPoint = minDistance(t, f.getOriNodes(),f.getEdge_ID());
+
+				RoadPoint roadPoint = minDistance(t, f.getOriNodes2D(),f.getEdge_ID());
 				if (roadPoint != null) {
 					d.add(roadPoint);
 					tmpfs.add(f);
@@ -443,18 +446,11 @@ public class ObtainedData2 {
 				t.setRoadsDatas(tmpfs);
 				t.setRoadDates(idMap);
 				finalTestDatas.add(t);
+
 			}
 		}
 
-		//for (int q = 0; q < finalTestDatas.size(); q++) {
-		//	for (int w = 0; w < finalTestDatas.get(q).getRoadPoints().size(); w++) {
-		//		System.out.println(q+"---"+finalTestDatas.get(q).getRoadPoints().get(w).getEdge_ID()+
-		//				"---"+finalTestDatas.get(q).getRoadPoints().get(w).getMindistance());
-		//	}
-		//
-		//	System.out.println();
-		//}
-		//System.out.println(finalTestDatas.size());
+
 
 		// 计算测量概率，结果保存procept
 
@@ -462,73 +458,245 @@ public class ObtainedData2 {
 		for (int k = 0; k < finalTestDatas.size(); k++) {
 			TestData testdate = finalTestDatas.get(k);
 			List<measureP> mpsList = new ArrayList<>();
+			Map<Long, Double> mplist = new HashMap<>();
 			measureP p = null;
 			for (int q = 0; q < testdate.getRoadPoints().size(); q++) {
 				p = new measureP();
 				RoadPoint roadPoint = testdate.getRoadPoints().get(q);
 				// System.out.println(roadPoint.getMindistance());
-				procept = HMM.b(10, roadPoint.getMindistance());
+				procept = HMM.b(4.07, roadPoint.getMindistance());
 				p.setID(testdate.getRoadsDatas().get(q).getEdge_ID());
 				p.setP(procept);
 				mpsList.add(p);
+				mplist.put(p.getID(),p.getP());
+
 			}
+			testdate.setMpList(mplist);
 			testdate.setMpsList(mpsList);
 		}
 
+		Map<Long, Integer> indexs = new HashMap<>();
+		Map<Long, FixData> index_fixDataMap = new HashMap<>();
+		Map<Long, RoadPoint> index_roadPointMap = new HashMap<>();
+		int indexCount = 0;
+		double[][] emit_p;
+		double[][] trans_p;
+		double[] start_p;
+		int[] obs;
+		int[] states;
+		int p = 0;
+		TestData t;
+		Node n1;
+		Node n2;
+		List<Long> results = new ArrayList<>();
 		/**
-		 *  key:路ID
-		 *  value:路数据		 *
+		 * 维特比
 		 */
 
-		Map<Long, FixData> index_fixDataMap = new HashMap<>();
-//		增强型的for循环，把finalTestDatas进行遍历
-		for (TestData t : finalTestDatas) {
-			for (int kk = 0; kk < t.getMpsList().size(); kk++) {
-				index_fixDataMap.put(t.getRoadsDatas().get(kk).getEdge_ID(), t
-						.getRoadsDatas().get(kk));
+		//向后取5个测试数据的候选?路段信息    和数字做映射
+
+		for (int z = 0; z < finalTestDatas.size()-3; z++) {
+			for (int w = 0; w < 3; w++) {
+				t = finalTestDatas.get(z + w);
+				n1=new Node(finalTestDatas.get(z +1).getLon2D(),finalTestDatas.get(z +1).getLat2D());
+				n2=new Node(finalTestDatas.get(z +2).getLon2D(),finalTestDatas.get(z +2).getLat2D());
+				obs = new int[]{0,1};
+
+
+				for (int e = 0; e < t.getMpsList().size(); e++) {
+					index_fixDataMap.put(t.getRoadsDatas().get(e).getEdge_ID(),t.getRoadsDatas().get(e));
+					index_roadPointMap.put(t.getRoadPoints().get(e).getEdge_ID(), t.getRoadPoints().get(e));
+
+				}
+				states = new int[index_fixDataMap.size()];
+				for (Long l : index_fixDataMap.keySet()) {
+					indexs.put(l, indexCount++);
+				}
+				//初始概率矩阵
+				start_p = new double[t.getMpsList().size()];
+				if(z==0&&w==0){
+					start_p = new double[]{0,0,0,0,0,0,1,0};
+				}else {
+					for (int r = 0; r < t.getMpsList().size(); r++) {
+						measureP measureP = t.getMpsList().get(r);
+
+						start_p[indexs.get(measureP.getID())] = measureP.getP();
+					}
+				}
+
+				//测量概率矩阵
+				emit_p = new double[indexs.size()][2];
+				//转移概率矩阵
+				trans_p = new double[indexs.size()][indexs.size()];
+
+				for (int e = 0; e < 2; e++) {
+					t = finalTestDatas.get(z+e+1);
+					for (int r = 0; r < t.getMpsList().size(); r++) {
+						if(indexs.containsKey(t.getMpsList().get(r).getID())){
+							emit_p[indexs.get(t.getMpsList().get(r).getID())][e] = t.getMpsList().get(r).getP();
+						}
+					}
+				}
+				int index1,index2;
+				FixData cur, nex;
+				RoadPoint cur_rp, nex_rp;
+				double distance_test;
+				double distance_cacul;
+				for (Long e_cur : indexs.keySet()) {
+					for (Long e_nex : indexs.keySet()) {
+						cur = index_fixDataMap.get(e_cur);
+						nex = index_fixDataMap.get(e_nex);
+						cur_rp = index_roadPointMap.get(e_cur);
+						nex_rp=index_roadPointMap.get(e_nex);
+						index1 = indexs.get(e_cur);
+						index2 = indexs.get(e_nex);
+						if(cur.getEdge_ID()==nex.getEdge_ID()){
+							trans_p[index1][index2] = 1;
+						}else {
+							if(cur.getTo_Node_ID()==nex.getFrom_Node_ID()){
+								distance_test=Gdistance.get2Ddistance(n1.getLon(),n1.getLat(),n2.getLon(),n2.getLat());
+								Node n3 = cur.getOriNodes2D().get(cur.getOriNodes2D().size() - 1);
+								Node n4 = cur_rp.getCaculNode();
+								Node n5 = nex_rp.getCaculNode();
+								distance_cacul = Gdistance.get2Ddistance(n3.getLon(), n3.getLat(), n4.getLon(), n4.getLat()) +
+										Gdistance.get2Ddistance(n3.getLon(), n3.getLat(), n5.getLon(), n5.getLat());
+								trans_p[index1][index2] = distance_test/distance_cacul;
+							}else {
+								trans_p[index1][index2] = 0;
+							}
+						}
+					}
+				}
+
+				for (Map.Entry<Long, Integer> longIntegerEntry : indexs.entrySet()) {
+					states[p++] = longIntegerEntry.getValue();
+				}
+				int[] result = Viterbi.compute(obs,states,start_p,trans_p,emit_p);
+				System.out.println(result.length);
+				for (Map.Entry<Long, Integer> entry : indexs.entrySet()) {
+					for (int s = 0; s < result.length; s++) {
+						if(entry.getValue()==result[s]){
+							results.add(entry.getKey());
+						}
+					}
+				}
+				index_fixDataMap.clear();
+				index_roadPointMap.clear();
+				indexs.clear();
+				indexCount = 0;
+				p = 0;
 			}
 		}
+		int count = 0;
+		for (int x = 0; x < results.size()-1; x++) {
+			double result = results.get(x);
+			if(result==results.get(x+1)){
+				continue;
+			}
+			else {
+				BigDecimal bg=new BigDecimal(result);
+				count++;
+				System.out.println(bg.toPlainString());
+			}
+
+		}
+		System.out.println(count);
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/**
+		 *  key:路ID
+		 *  value:路数据
+		 *  所有用到的路网放进index_fixDataMap
+		 */
+
+//		Map<Long, FixData> index_fixDataMap = new HashMap<>();
+////		增强型的for循环，把finalTestDatas进行遍历
+//		for (TestData t : finalTestDatas) {
+//			for (int kk = 0; kk < t.getMpsList().size(); kk++) {
+//
+//				index_fixDataMap.put(t.getRoadsDatas().get(kk).getEdge_ID(), t
+//						.getRoadsDatas().get(kk));
+//			}
+//		}
 
 		/**
 		 * key :路ID
 		 * value: 计数
+		 * 所有用到的路 进行编号    ***
 		 */
-		Map<Long, Integer> indexs = new HashMap<>();
-//      设置计数器
-		int indexCount = 0;
-
-		for (Long l : index_fixDataMap.keySet()) {
-			indexs.put(l, indexCount++);
-		}
-
-		//测量概率表示
-		measureRate = new double[finalTestDatas.size()][indexs.size()];
-		// 对二维数组measureRate进行遍历
-		for (int ii = 0; ii < finalTestDatas.size(); ii++) {
-			for (int kk = 0; kk < indexs.keySet().size(); kk++) {
-				measureRate[ii][kk] = 0;
-			}
-		}
+//		Map<Long, Integer> indexs = new HashMap<>();
+////      设置计数器
+//		int indexCount = 0;
+//
+//		for (Long l : index_fixDataMap.keySet()) {
+//			indexs.put(l, indexCount++);
+//		}
+//
+//		//测量概率表示
+//		measureRate = new double[finalTestDatas.size()][indexs.size()];
+//		// 对二维数组measureRate进行遍历
+//		for (int ii = 0; ii < finalTestDatas.size(); ii++) {
+//			for (int kk = 0; kk < indexs.keySet().size(); kk++) {
+//				measureRate[ii][kk] = 0;
+//			}
+//		}
 
 		//对finalTestDatas进行遍历，结果存储在t中。对二维数组进行表示，其中k表示finalTestDatas的大小，col表示list的指针
-		for (int k = 0; k < finalTestDatas.size(); k++) {
-			TestData t = finalTestDatas.get(k);
-			for (int ll = 0; ll < t.getMpsList().size(); ll++) {
-				int col = indexs.get(t.getMpsList().get(ll).getID());
-				// System.out.println(t.getMpsList().get(ll).getP());
-				measureRate[k][col] = t.getMpsList().get(ll).getP();
-			}
-		}
+		//for (int k = 0; k < finalTestDatas.size(); k++) {
+		//	TestData t = finalTestDatas.get(k);
+		//	for (int ll = 0; ll < t.getMpsList().size(); ll++) {
+		//		//路对应的 编号
+		//		int col = indexs.get(t.getMpsList().get(ll).getID());
+		//		measureRate[k][col] = t.getMpsList().get(ll).getP();
+		//	}
+		//}
+
 
 		/**
 		 * 计算初始状态转移概率矩阵
 		 */
 
-		double[] start=new double[indexs.size()];
-		//初始状态转移概率矩阵是测量概率矩阵的第一行，也就是第一个GPS点匹配哪条路的概率
-		for(int kk=0;kk<measureRate[0].length;kk++){
-			start[kk]=measureRate[0][kk];
-		}
+		//double[] start=new double[indexs.size()];
+		////初始状态转移概率矩阵是测量概率矩阵的第一行，也就是第一个GPS点匹配哪条路的概率
+		//for(int kk=0;kk<measureRate[0].length;kk++){
+		//	start[kk]=measureRate[0][kk];
+		//}
+		///**
+		// * 转移概率矩阵
+		// */
+		//double[][] transRate = new double[indexs.size()][indexs.size()];
+		//System.out.println();
+
+
+		///**
+		// * 转移概率计算
+		// */
+		//for (int t = 0; t < finalTestDatas.size()-1; t++) {
+		//	TestData cur = finalTestDatas.get(t);
+		//	TestData next=finalTestDatas.get(t+1);
+		//	for (int y = 0; y < cur.getRoadPoints().size(); y++) {
+		//		RoadPoint rpNow = cur.getRoadPoints().get(y);
+		//		for (int u = 0; u < next.getRoadPoints().size(); u++) {
+		//			RoadPoint rpNext = next.getRoadPoints().get(u);
+		//			if(rpNow.getEdge_ID()==rpNext.getEdge_ID()){
+		//
+		//			}
+		//
+		//		}
+		//
+		//	}
+		//}
 
 
 
@@ -656,11 +824,12 @@ public class ObtainedData2 {
 		double distance = 0;
 
 		for (int i = 0; i < oriNodes.size() - 1; i++) {
-			double d = pointToLine.PointToLine(oriNodes.get(i).getLat(),
-					oriNodes.get(i).getLon(), oriNodes.get(i + 1).getLat(),
-					oriNodes.get(i + 1).getLon(), t);
+			double d = pointToLine.PointToLine(oriNodes.get(i).getLon(),
+					oriNodes.get(i).getLat(), oriNodes.get(i + 1).getLon(),
+					oriNodes.get(i + 1).getLat(), t);
 			//System.out.println(d);
-			if (distance < d) {
+
+			if (distance==0 || distance > d) {
 				distance = d;
 				roadPoint.setLonStart(oriNodes.get(i).getLon());
 				roadPoint.setLatStart(oriNodes.get(i).getLat());
@@ -677,17 +846,20 @@ public class ObtainedData2 {
 		}else {
 			//计算投影点
 			//计算每条道路的斜率
-			double	 kk=Ppoint.slope(roadPoint.getLatStart(),roadPoint.getLonStart(),
-					roadPoint.getLatEnd(),roadPoint.getLonEnd());
+			double	 k=Ppoint.slope(roadPoint.getLonStart(),roadPoint.getLatStart(),
+					roadPoint.getLonEnd(),roadPoint.getLatEnd());
             //计算GPS点到每条道路的投影点
-			Node node=Ppoint.cacul_shadow(roadPoint.getLatStart(),
-					roadPoint.getLonStart(),	 roadPoint.getLatEnd(),roadPoint.getLonEnd(), t,kk);
+			Node node=Ppoint.cacul_shadow(roadPoint.getLonStart(),
+					roadPoint.getLatStart(),	 roadPoint.getLonEnd(),roadPoint.getLatEnd(), t,k);
 			Node a = new Node(roadPoint.getLonStart(), roadPoint.getLatStart());
 			Node b = new Node(roadPoint.getLonEnd(), roadPoint.getLatEnd());
-			Node c = new Node(t.getLon(), t.getLat());
-			Node p=new Node(node.getLat(), node.getLon());
+			Node c = new Node(t.getLon2D(), t.getLat2D());
+			Node p = node;
+			//System.out.println(Gdistance.get2Ddistance(c.getLon(),c.getLat(),p.getLon(),p.getLat()));
+			//System.out.println(pointToLine.PointToLine(a.getLon(),a.getLat(),b.getLon(),b.getLat(),t));
+
 			boolean is = isInTriangle(a,b,c,p);
-			System.out.println(is);
+			//System.out.println(is);
 			if (is){
 				roadPoint.setCaculNode(node);
 			}
@@ -738,35 +910,14 @@ public class ObtainedData2 {
 	 * @return
 	 */
 
-	@Test
-	public void test1(){
-		Node a = new Node(117.30365,39.005054);
-		Node b = new Node(117.327509,39.012287);
-		Node c = new Node(117.327572,38.996649);
-		Node p = new Node(117.342448,39.011061);
-		System.out.println(isInTriangle(a,b,c,p));
-	}
+
 
 	public static boolean isInTriangle(Node A,Node B,Node C,Node P){
-		//double a = 0, b = 0, c = 0;
-		//
-		//Node MA = new Node(P.getLat() - A.getLat(),P.getLon() - A.getLon());
-		//Node MB = new Node(P.getLat() - B.getLat(),P.getLon() - B.getLon());
-		//Node MC = new Node(P.getLat() - C.getLat(),P.getLon() - C.getLon());
-		//
-		///*向量叉乘*/
-		//a = MA.getLat() * MB.getLon() - MA.getLon() * MB.getLat();
-		//b = MB.getLat() * MC.getLon() - MB.getLon() * MC.getLat();
-		//c = MC.getLat() * MA.getLon() - MC.getLon() * MA.getLat();
-		//
-		//if((a <= 0 && b <= 0 && c <= 0)||
-		//		(a > 0 && b > 0 && c > 0))
-		//	return true;
-		//return false;
-		double a = Gdistance.getDistance(A.getLat(), A.getLon(), P.getLat(), P.getLon());
-		double b = Gdistance.getDistance(B.getLat(), B.getLon(), P.getLat(), P.getLon());
-		double c =Gdistance.getDistance(B.getLat(), B.getLon(), A.getLat(), A.getLon());
-		if (a<c&&b<c){
+
+		double a = Gdistance.get2Ddistance(A.getLat(), A.getLon(), P.getLat(), P.getLon());
+		double b = Gdistance.get2Ddistance(B.getLat(), B.getLon(), P.getLat(), P.getLon());
+		double c =Gdistance.get2Ddistance(B.getLat(), B.getLon(), A.getLat(), A.getLon());
+		if (a<c && b<c){
 			return true;
 		}
 		else {

@@ -8,6 +8,7 @@ public class RoadPoint {
 	private double latEnd;
 	private double mindistance;
 	private Node caculNode;
+	private long edge_ID;
 
 	public long getEdge_ID() {
 		return edge_ID;
@@ -17,7 +18,7 @@ public class RoadPoint {
 		this.edge_ID = edge_ID;
 	}
 
-	private long edge_ID;
+
 
 
 	public Node getCaculNode() {

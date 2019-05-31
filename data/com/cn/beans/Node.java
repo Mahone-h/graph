@@ -7,11 +7,18 @@ public class Node {
 	}
 	double lon;
 	double lat;
+	double lon2D;
+	double lat2D;
 	public Node(double lon, double lat) {
 		super();
 		this.lon = lon;
 		this.lat = lat;
 	}
+
+	public Node(Node to2D) {
+
+	}
+
 	public double getLon() {
 		return lon;
 	}

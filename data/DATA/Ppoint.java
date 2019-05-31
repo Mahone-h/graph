@@ -10,85 +10,89 @@ import org.omg.CORBA.PUBLIC_MEMBER;
 import com.cn.beans.Node;
 import com.cn.beans.TestData;
 
+import static java.lang.Double.isInfinite;
+
 public class Ppoint {
+
+
+
 	public static Node cacul_shadow(double x1, double y1, double x2, double y2,
 			TestData testData, double k) {
 		
-		Node node=null;
+
 		double x4 = 0;
 		double y4 = 0;
-		double x3 = testData.getLat();
-		double y3 = testData.getLon();
+		double x3 = testData.getLon2D();
+		double y3 = testData.getLat2D();
+		//double x3 = testData.getLon();
+		//double y3 = testData.getLat();
 
 		if (k == 0) // 垂线斜率不存在情况
 		{
 			x4 = x3;
 			y4 = y1;
-		} else {
-			x4 = (k * x1 + x3 / k + y3 - y1) / (1 / k + k);
-			y4 = -1 / k * (x4 - x3) + y3;
-			// return x4;
+
+			return new Node(x4, y4);
+
 		}
-		node=new Node(x4, y4);
-		return node;
+		if(isInfinite(k)){
+			x4 = x1;
+			y4 = y3;
+			//System.out.println(k);
+			return new Node(x4, y4);
+		}
+
+		x4 = (k * x1 + x3 / k + y3 - y1) / (1 / k + k);
+		y4 = -1 / k * (x4 - x3) + y3;
+
+
+
+		return new Node(x4, y4);
 
 	};
 
 	public static double slope(double x1, double y1, double x2, double y2) {
 		double k = 0;
-		if (x1 == x2 & y1 == y2) {
+
+		if (y1 == y2) {
 			k = 0;
 			return k;
 		}
 
+
 		k = (y2 - y1) / (x2 - x1);
-		System.out.println(k);
+		//System.out.println(k);
 		return k;
 
 	}
 
 
 	public static void main(String[] args) {
-		//double k = slope(-122.105779051781,47.6666790246964,-122.105398178101,47.6675292849541);
-		//System.out.println(k);
-		//Node node = Ppoint.cacul_shadow(-122.105779051781, 47.6666790246964, -122.105398178101, 47.6675292849541,
-		//		new TestData(47.66751667,-122.1066), k);
-		//System.out.println(node);
-		//System.out.println(Gdistance.getDistance(47.66751667,-122.1066,node.getLat(),node.getLon()));
 
-		//double k = slope(-122.105779051781,47.6666790246964, -122.105398178101,47.6675292849541);
-		//System.out.println(k);
-		//Node node = Ppoint.cacul_shadow(-122.105779051781,47.6666790246964, -122.105398178101,47.6675292849541,
-		//		new TestData(47.66751667,-122.1067333), k);
-		//System.out.println(node);
-		//System.out.println(Gdistance.getDistance(47.66751667,-122.1067333,node.getLat(),node.getLon()));
-		//System.out.println(pointToLine.PointToLine(-122.105779051781,47.6666790246964, -122.105398178101,47.6675292849541,
-		//		new TestData(47.66751667,-122.1067333)));
-		//System.out.println(ObtainedData2.isInTriangle(new Node(-122.105779051781,47.6666790246964),
-		//		new Node(-122.105398178101,47.6675292849541),
-		//		new Node(-122.1067333,47.66751667),
-		//		node));
 
 		Node a = new Node(-122.105779051781,47.6666790246964);
-		//Node a = new Node(205.395583333332,57.9323888888888);
+
 		Node b = new Node(-122.105398178101,47.6675292849541);
 		Node c = new Node(-122.1067333,47.66751667);
-		//a = Transform.to2D(a.getLon(),a.getLat());
-		//b = Transform.to2D(b.getLon(),b.getLat());
-		//c = Transform.to2D(c.getLon(),c.getLat());
+
+		double k = slope(a.getLon(),a.getLat(),b.getLon(),b.getLat());
+
+		a = Transform.to2D(a.getLon(),a.getLat());
+		b = Transform.to2D(b.getLon(),b.getLat());
+		c = Transform.to2D(c.getLon(),c.getLat());
 		System.out.println(a);
 		System.out.println(b);
 		System.out.println(c);
-		double k = slope(a.getLon(),a.getLat(),b.getLon(),b.getLat());
-		System.out.println(k);
+		k = slope(a.getLon(),a.getLat(),b.getLon(),b.getLat());
+
 		Node node= Ppoint.cacul_shadow(a.getLon(),a.getLat(),b.getLon(),b.getLat(),
-				new TestData(c.getLat(),c.getLon()), k);
+				new TestData(c.getLon(),c.getLat()), k);
 		System.out.println(node);
-		//node = Transform.to2D(node.getLon(), node.getLat());
-		System.out.println(node);
-		System.out.println(Gdistance.getDistance(c.getLat(),c.getLon(),node.getLat(),node.getLon()));
-		System.out.println(pointToLine.PointToLine(a.getLon(),a.getLat(),b.getLon(),b.getLat(),
-				new TestData(c.getLat(),c.getLon())));
+
+		System.out.println("测试点到垂足距离："+Gdistance.get2Ddistance(c.getLat(),c.getLon(),node.getLat(),node.getLon()));
+		System.out.println("点到线距离"+pointToLine.PointToLine(a.getLon(),a.getLat(),b.getLon(),b.getLat(),
+				new TestData(c.getLon(),c.getLat())));
+
 		System.out.println(ObtainedData2.isInTriangle(a,b,c,
 				node));
 		System.out.println(Gdistance.getDistance(node.getLat(),node.getLon(),a.getLat(),a.getLon()));

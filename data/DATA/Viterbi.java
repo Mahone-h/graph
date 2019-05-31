@@ -4,25 +4,26 @@ public class Viterbi {
 
 	/**
 	 * 求解HMM模型
-	 * 
+	 *
 	 * @param obs
-	 *            观测序列
+	 *            观测序列  测试集  候选路段
 	 * @param states
-	 *            隐状态
+	 *            隐状态   候选路段
 	 * @param start_p
 	 *            初始概率（隐状态）
 	 * @param trans_p
 	 *            转移概率（隐状态）
 	 * @param emit_p
-	 *            发射概率 （隐状态表现为显状态的概率）
+	 *            测量概率 （隐状态表现为显状态的概率）
 	 * @return 最可能的序列
 	 */
 
 	public static int[] compute(int[] obs, int[] states, double[] start_p,
-			double[][] trans_p, double[][] emit_p) {
+			double[][] trans_p, double[][] emit_p)
+	{
 		double[][] V = new double[obs.length][states.length];
 		int[][] path = new int[states.length][obs.length];
-		
+
     /*foreach的语句格式：对每个数组进行遍历，for(int y = 0;y  < states.length; y++){} 是一个意思
 
       for(元素类型t 元素变量x : 遍历对象obj){
@@ -31,11 +32,11 @@ public class Viterbi {
 
        }*/
 		for (int y : states) {
-			V[0][y] = start_p[y] * emit_p[y][obs[0]];//在位置0，以y状态为末尾的状态序列的最大概率
+			V[0][y] = start_p[y] * emit_p[y][obs[0]];//在位置0，以y状态为末尾的状态序列的概率
 
 			path[y][0] = y;
 		}
-		
+
 		for (int t = 1; t < obs.length; ++t) {
 			int[][] newpath = new int[states.length][obs.length];
 			for (int y : states) {
@@ -60,8 +61,8 @@ public class Viterbi {
 			}
 			path = newpath;
 		}
-		
-		
+
+
 		double prob = -1;
 		int state = 0;
 		for (int y : states) {

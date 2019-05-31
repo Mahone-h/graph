@@ -5,6 +5,7 @@ public class Transform {
    static double PI = 3.1415926535897932384626;
    static double a = 6378245.0;
    static double ee = 0.00669342162296594323;
+   static double M_PI = Math.PI;
 
    /**
     * 百度坐标系 (BD-09) 与 火星坐标系 (GCJ-02)的转换
@@ -93,7 +94,7 @@ public class Transform {
     * @returns {*[]}
     * 
     */
-    public  String  wgs84tobd09(double lng, double lat){
+    public static String  wgs84tobd09(double lng, double lat){
           //第一次转换
           double dlat = transformlat(lng - 105.0, lat - 35.0);
           double dlng = transformlng(lng - 105.0, lat - 35.0);
@@ -114,7 +115,7 @@ public class Transform {
           return bd_lng+","+bd_lat;
     }
 
-   public  double transformlat(double lng,double lat){
+   public static double transformlat(double lng, double lat){
        double ret= -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng));
        ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
        ret += (20.0 * Math.sin(lat * PI) + 40.0 * Math.sin(lat / 3.0 * PI)) * 2.0 / 3.0;
@@ -122,7 +123,7 @@ public class Transform {
        return ret;
    }
 
-   public  double transformlng(double lng,double lat){
+   public static double transformlng(double lng, double lat){
        double ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng));
        ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
        ret += (20.0 * Math.sin(lng * PI) + 40.0 * Math.sin(lng / 3.0 * PI)) * 2.0 / 3.0;
@@ -133,23 +134,39 @@ public class Transform {
 
    public static Node to2D(double lon, double lat){
 
+       double x = lon * 20037508.34 / 180;
 
-       int lonDegree= (int) lon;
-       int latDegree = (int) lat;
-       System.out.println(lon-lonDegree);
-       double dlonMin = (lon - lonDegree) * 60;
-       double dlatMin = (lat - latDegree) * 60;
-       int lonMin = (int) (dlonMin);
-       int latMin = (int) (dlatMin);
-       double dlonSec = (dlonMin-lonMin)*60;
-       double dlatSec = (dlatMin-latMin)*60;
+       double y = Math.log(Math.tan((90 + lat) * PI / 360)) / (PI / 180);
+       y = y * 20037508.34 / 180;
+       return new Node(x, y);
+   }
+   public static double lonto2D(double lon){
+       double x = lon * 20037508.34 / 180;
+       return x;
+   }
+    public static double latto2D(double lat){
+        double y = Math.log(Math.tan((90 + lat) * PI / 360)) / (PI / 180);
+        y = y * 20037508.34 / 180;
+        return y;
+    }
+    public static double lontoGPS(double lon){
+        double x = lon / 20037508.34 * 180;
+        return x;
+    }
+    public static double lattoGPS(double lat){
+        double y = lat / 20037508.34 * 180;
+        y = 180 / PI * (2 * Math.atan(Math.exp(y * PI / 180)) - PI / 2);
+        return y;
+    }
 
-       Node node = new Node(lonDegree+dlonMin/60+dlonSec/3600,latDegree+dlatMin/60+dlatSec/3600);
-       System.out.println(node);
-       return node;
+   public static Node toGps(double lon, double lat){
+       double x = lon / 20037508.34 * 180;
+       double y = lat / 20037508.34 * 180;
+       y = 180 / PI * (2 * Math.atan(Math.exp(y * PI / 180)) - PI / 2);
+       return new Node(x, y);
    }
 
-   public void main(String[] args) {
+   public static void main(String[] args) {
     ////两次谷歌转换为百度坐标
     // //第一次  WGS84转GCj02
     //   String lnglat=wgs84togcj02(117.20296517261839,31.841652709281103);
@@ -161,7 +178,10 @@ public class Transform {
 
        //谷歌转百度一次转换-122.118838727474 47.6684412360191 -122.121528983116 47.6684600114822
 
-       System.out.println("谷歌转换为百度一次转换的结果:"+wgs84tobd09(-122.118838727474,47.6684412360191 ));
+     //  -122.105298936367 47.6440492272377  Node [lon=-122.87109375, lat=47.624479830265]
+       System.out.println(lonto2D(-122.87109375)+"--"+latto2D(47.624479830265));
+       //System.out.println("谷歌转换为百度一次转换的结果:"+wgs84tobd09(-122.105298936367,47.6440492272377));
+       //System.out.println(to2D(-122.105779051781,47.6666790246964));
        //自己:117.32063153576345,39.005225621015775
 }
 

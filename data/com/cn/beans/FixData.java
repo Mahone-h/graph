@@ -12,8 +12,9 @@ public class FixData{
 	private long from_Node_ID;
 	private long to_Node_ID;
 	private int two_Way;
-	List nodes=new ArrayList<>();
-	List<Node> oriNodes=new ArrayList<>();
+	List nodes;
+	List<Node> oriNodes;
+	List<Node> oriNodes2D;
 	
 	
 	public long getEdge_ID() {
@@ -49,11 +50,20 @@ public class FixData{
 	public List<Node> getOriNodes() {
 		return oriNodes;
 	}
+
+	public List<Node> getOriNodes2D() {
+		return oriNodes2D;
+	}
+
+	public void setOriNodes2D(List<Node> oriNodes2D) {
+		this.oriNodes2D = oriNodes2D;
+	}
+
 	public void setOriNodes(List<Node> oriNodes) {
 		this.oriNodes = oriNodes;
 	}
 	public FixData(long edge_ID, long from_Node_ID, long to_Node_ID,
-			int two_Way, List nodes, List<Node> oriNodes) {
+			int two_Way, List nodes, List<Node> oriNodes,List<Node> oriNodes2D) {
 		super();
 		this.edge_ID = edge_ID;
 		this.from_Node_ID = from_Node_ID;
@@ -61,6 +71,7 @@ public class FixData{
 		this.two_Way = two_Way;
 		this.nodes = nodes;
 		this.oriNodes = oriNodes;
+		this.oriNodes2D = oriNodes2D;
 	}
 	
 	

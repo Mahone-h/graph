@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DATA.Viterbi;
 import org.junit.Test;
 
 import DATA.Gdistance;
@@ -23,7 +24,7 @@ import com.cn.beans.RoadsData;
 import com.cn.beans.TestData;
 import com.cn.beans.measureP;
 import com.hankcs.algorithm.HMM;
-import com.hankcs.algorithm.Viterbi;
+
 
 import javax.swing.*;
 
@@ -141,7 +142,7 @@ public class ObtainedData {
 //			在fix对象中添加FixData类里存的道路信息属性
 			fix.add(new FixData(data.get(i).getEdge_ID(), data.get(i)
 					.getFrom_Node_ID(), data.get(i).getTo_Node_ID(), data
-					.get(i).getTwo_Way(), nodes, data.get(i).getNodes()));
+					.get(i).getTwo_Way(), nodes, data.get(i).getNodes(),data.get(i).getNodes2D()));
 			/*
 			 * 实现类的clear 方式将里面的所有元素都释放了并且清空里面的属性 
 			 */

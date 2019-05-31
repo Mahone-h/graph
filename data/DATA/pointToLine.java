@@ -8,40 +8,27 @@ public class pointToLine {
 			double y2, TestData t) {
  		double space = 0.0;
 
-		double x_0 = t.getLat();
-		double y_0 = t.getLon();
+		double x_0 = t.getLon2D();
+		double y_0 = t.getLat2D();
+		//double x_0 = t.getLon();
+		//double y_0 = t.getLat();
         double a, b, c;
 		
 		
-		a = Gdistance.getDistance(x1, y1, x2, y2);// 线段的长度
+		a = Gdistance.get2Ddistance(x1, y1, x2, y2);// 线段的长度
 //		System.out.println("a="+a);
 
-		b = Gdistance.getDistance(x1, y1, x_0, y_0);// (x1,y1)到点的距离
+		b = Gdistance.get2Ddistance(x1, y1, x_0, y_0);// (x1,y1)到点的距离
 //		System.out.println("b="+b);
 
-       	c = Gdistance.getDistance(x2, y2, x_0, y_0);// (x2,y2)到点的距离
-//		System.out.println("c="+c);
-
-//		if (c <= 0.000001 || b <= 0.000001) {
-//			space = 0;
-//			return space;
-//		}
-//		if (a <= 0.000001) {
-//			space = b;
-//			return space;
-//		}
-//		if (c * c >= a * a + b * b) {
-//			space = b;
-//			return space;
-//		}
+       	c = Gdistance.get2Ddistance(x2, y2, x_0, y_0);// (x2,y2)到点的距离
+//		a = Gdistance.getDistance(x1, y1, x2, y2);// 线段的长度
+////		System.out.println("a="+a);
 //
-//		if (b * b >= a * a + c * c) {
+//		b = Gdistance.getDistance(x1, y1, x_0, y_0);// (x1,y1)到点的距离
+////		System.out.println("b="+b);
 //
-//			space = c;
-//
-//			return space;
-//
-//		}
+//		c = Gdistance.getDistance(x2, y2, x_0, y_0);// (x2,y2)到点的距离
 
 		double p = (a + b + c) / 2;// 半周长
 

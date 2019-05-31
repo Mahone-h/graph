@@ -1,5 +1,9 @@
 package DATA;
 
+import com.cn.beans.Transform;
+
+import static java.lang.Double.isNaN;
+
 public class Gdistance {
 	
 		private static double EARTH_RADIUS = 6378137.0;
@@ -9,7 +13,7 @@ public class Gdistance {
 		}
 	 
 		/**
-		 * 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷纬锟斤拷之锟斤拷木锟斤拷锟�
+		 * gps点两点间的距离
 		 * @param lat1
 		 * @param lng1
 		 * @param lat2
@@ -30,15 +34,25 @@ public class Gdistance {
 
 		   return s;
 		}
+		public static double get2Ddistance(double lat1, double lng1,double lat2, double lng2)		{
+
+			double s = Math.sqrt(Math.pow(lat2 - lat1, 2) + Math.pow(lng2 - lng1, 2));
+			if(isNaN(s)){
+				System.out.println();
+			}
+			return s;
+		}
 		
 		
 		
 		public static void main(String[] args) {
 			System.out.println(Gdistance.getDistance(
 					47.66751667,-122.1066,47.66707039478913,-122.1056037377332
-
-					
 					));
+			System.out.println(get2Ddistance(Transform.latto2D(47.66751667),
+					Transform.lonto2D(-122.1066),
+					Transform.latto2D(47.66707039478913),
+					Transform.lonto2D(-122.1056037377332)));
 		}
 	}
 
