@@ -5,7 +5,9 @@ import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
-
+/**
+ *  马尔科夫模型
+ */
 
 public class Distributions {
 	static double normalDistribution(double sigma, double x) {
